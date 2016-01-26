@@ -1,0 +1,12 @@
+{
+  "asi": true,
+  "es3": true,
+  "laxbreak": true,
+  "unused": true,
+  "curly": false,
+  "eqeqeq": false,
+  "expr": true,
+  "eqnull": true,
+  "proto": true
+}
+

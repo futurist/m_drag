@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script src="http://cdn.bootcss.com/mithril/0.2.0/mithril.js"></script>
+<script type="text/javascript" src="../dist/m_drag.js"></script>
+<style type="text/css">
+html,body{
+	height: 100%;
+}
+body {
+    margin:0;
+    padding: 0;
+    font: 12px Arial;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.knob {
+    width: 83px;
+    height: 83px;
+    position: relative;
+    float: left;
+    margin: 20px
+}
+
+.knob .top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 83px;
+    height: 83px;
+    background: url('http://1111hui.com/images/knob.png') no-repeat;
+    z-index: 10;
+    cursor: default;
+    transform: rotate(164deg);
+}
+.knob.xaxis .top{
+    cursor: ew-resize;
+}
+.knob.yaxis .top{
+    cursor: ns-resize;
+}
+
+.knob .base {
+    width: 83px;
+    height: 83px;
+    border-radius: 50%;
+    box-shadow: 0 5px 0 #4a5056,5px 5px 5px #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+.knob .top:after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: #666;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    margin-top: -5px;
+    border-radius: 50%;
+    cursor: default !important;
+    box-shadow: 0 0 1px #5a5a5a inset;
+}
+#dom{
+    margin:20px auto 0;
+    width: 390px;
+    display: block;
+    height: 322px;
+}
+#dom li{
+    float: left;
+    width: 124px;
+    text-align: center;
+}
+ul,li{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#vdom{
+    background: #eee;
+    padding: 10px 20px 0;
+    margin:20px auto 0;
+    width: 440px;
+    position: relative;
+    top: 20px;
+    min-height: 200px;
+}
+.newsCon{
+	display : flex
+}
+.tip{
+}
+.left,
+.right
+{
+	-webkit-flex: 1 1 auto;
+	flex: 1 1 auto;
+    margin: 10px;
+    background: #ccc;
+    min-height: 120px;
+}
+
+#vdom li{
+    text-align: center;
+    line-height: 60px;
+    cursor: default;
+    border: 1px solid #C19A9A;
+    margin: 10px;
+    background-color: #eee;
+}
+#vdom .active{
+    background-color: #333;
+    color:white;
+    position: relative;
+}
+</style>
+</head>
+<body>
+
+<div id="dom">
+	<h2>DOM DRAG DEMO</h2>
+    <div class="knob xaxis"><div class="top" style=""></div><div class="base"></div></div>
+    <div class="knob yaxis"><div class="top" style=""></div><div class="base"></div></div>
+    <div class="knob"><div class="top" style=""></div><div class="base"></div></div>
+    <ul><li>x-axis drag</li><li>y-axis drag</li><li>rotation drag</li></li>
+    <div class="knob"><div class="top" style=""></div><div class="base"></div></div>
+    <div class="knob"><div class="top" style=""></div><div class="base"></div></div>
+    <div class="knob"><div class="top" style=""></div><div class="base"></div></div>
+    <ul><li>left controller-&gt;</li><li>be controlled</li><li>&lt;-right controller</li></li>
+</div>
+
+<div id="vdom"></div>
+
+</body>
+</html>
+<script type="text/javascript">
+
+// Helper function to get angle from mouse pos
+function getAngle(dom, pageX, pageY){
+    var center = {x:dom.offsetLeft+dom.offsetWidth/2, y:dom.offsetTop+dom.offsetHeight/2}
+    var angle = Math.round(Math.atan2(center.y-pageY, pageX-center.x) * (180/Math.PI));
+    return angle
+}
+
+// drag for DOM demo, without mithril.js
+var initRotate = 164;
+var dragForDom = m_drag();
+var downHandler = function(idx){
+    return dragForDom('knob'+idx, {rotate:initRotate}, function(evt, data, dragStore){
+        var angle = -getAngle(data.target, data.pageX, data.pageY);
+        if(idx==4) return;  // knob4 is passive controlled
+        var delta = [
+            data.dx,    //for knob0
+            data.dy,    //for knob1
+            angle,angle,    //for knob2-5
+            angle,angle,
+        ]
+        var knob4 = dragStore['knob4']
+        knob4.target = document.querySelectorAll('.knob')[4]
+        var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
+        targets.forEach(function(d){
+            d.target.firstChild.style.transform = 'rotate('+ ( d.user.rotate+delta[idx] ) +'deg)'
+        })
+
+    }, function(evt, data){
+        data.user.rotate+=data.dx
+    });
+}
+
+var con = document.querySelectorAll('.knob')
+for(var i=con.length;i--;) con[i].onmousedown = downHandler(i)
+
+
+// vdom part
+
+
+var news={
+    left: ['NEWS 1', 'NEWS 2', 'NEWS 3', ],
+    right: ['NEWS 4', 'NEWS 5', 'NEWS 6', ]
+}
+var com = {
+    controller:function(){
+        var ctrl = this
+        var LI_WIDTH = 200
+        var LI_HEIGHT = 82
+        var dragClass = 'active'
+        var dragForVDom = m_drag();  // set mithril.m function as option
+        ctrl.redrawCount = 0
+        ctrl.eventCache = {}
+        ctrl.addClass = function(dom, className){
+        	if( !(new RegExp('\\b'+className+'\\b')).test(dom.className) ){
+	            dom.className+=className
+	        }
+        }
+        ctrl.removeClass = function(dom, className){
+        	dom.className= dom.className.split(new RegExp('\\b'+className+'\\b')).join(' ')
+        }
+        ctrl.downHandler = function(pos, idx){
+            return dragForVDom(
+	            	'news'+pos+idx, 
+	            	{
+	            		onmousedown:function(){
+	            			// prevent mithril redraw to allow mouse move
+	            			m.redraw.strategy('none'); 
+	            		}
+	            	}, 
+	            	// mouse move handler
+	            	function(evt, data, dragStore){
+
+		                var moveX = Math.round(-data.dx/LI_WIDTH)
+		                var moveY = Math.round(-data.dy/LI_HEIGHT)
+		                ctrl.addClass(data.target, dragClass)
+		                
+		                // below code to keep mousemove between mithril redraw
+		                evt.key = news[pos][idx]
+		                evt.oy = data.oy+moveY*LI_HEIGHT
+		                ctrl.eventCache = evt
+
+		                var opposite = pos=='right'?'left':'right'
+		                var changePos = pos=='left'&&moveX==1 || pos=='right'&&moveX==-1
+		                if( changePos && idx>=0 && idx<news[pos].length ) {
+		                	var n = news[pos].splice(idx,1)
+		                	// remember to delete registered dragHandler here
+		                	// since the element is not exists in dom according to news model
+		                	// Or, there may cause a MEMORY LEAK!!!!!!
+		                	delete dragStore['news'+pos+idx]
+
+		            		news[opposite].splice( Math.max(0, Math.min(idx+moveY, news[opposite].length)), 0, n.pop() )
+		                	m.redraw()
+		                }
+		                if( !changePos && moveY!==0 && idx+moveY>=0 && idx+moveY<news[pos].length){
+		                	// swap 2 element of array
+		                    var t = news[pos][idx+moveY]
+		                    news[pos][idx+moveY] = news[pos][idx]
+		                    news[pos][idx] = t
+		                    m.redraw()
+		                }
+
+		            },
+
+		            // mouse up handler
+		            function(evt, data, dragStore){
+		                ctrl.eventCache={}
+		                ctrl.removeClass(data.target, dragClass)
+		            }
+            )
+        }
+    },
+    view:function(ctrl){
+        return [
+        m('h2', 'MITHRIL V-DOM DRAG DEMO'),
+        m('.tip', JSON.stringify(news) ),
+        m('.newsCon',
+	        Object.keys(news).map(function(key){
+	            return m('ul.'+key, {key:key}, news[key].map(function(text, idx){
+		                    return m('li', {key:news[key][idx], config:function(el,old,ctx){
+		                        ctx.retain=true
+		                        if(ctrl.eventCache.key===news[key][idx] ) el.onmousedown(ctrl.eventCache);
+		                    }, 
+		                    onmousedown: ctrl.downHandler(key,idx)
+		                }, text)
+		            }))
+	        })
+        )
+        ]
+    }
+}
+m.mount( document.querySelector('#vdom'), com )
+
+</script>
