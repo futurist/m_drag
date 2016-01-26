@@ -1,7 +1,7 @@
 {
   "name": "m_drag",
   "version": "0.2.0",
-  "description": "",
+  "description": "no dependancy, minimum but strong drag lib for both dom and virtual dom support",
   "main": "m_drag.js",
   "scripts": {
     "make": "jshint lib/*.js && gulp",
