@@ -84,6 +84,7 @@ m('div.draggable',
 
 - `name`:  string, save internally to back reference, this will allow you to get drag status at any time, make 2 drag interact etc.
 - `userdata`:  object, that can pass in customer key&val, can accessable using `data.user` in `moveFunc` and `upFunc` function
+	- onmousedown:  special property for `userdata`, which will invoked when `downevent` happens, can be used to hook the downevent.
 - `moveFunc`:  function, with 3 parameters( evt, data, root )
 	- evt is mousemove/touchmove event object
 	- data is object, as below
