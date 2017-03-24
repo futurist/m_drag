@@ -3,7 +3,7 @@
 <head>
 <title></title>
 <script src="http://cdn.bootcss.com/mithril/0.2.0/mithril.js"></script>
-<script type="text/javascript" src="../dist/m_drag.js"></script>
+<script type="text/javascript" src="../dist/mdrag.iife.js"></script>
 <style type="text/css">
 html,body{
 	height: 100%;
@@ -31,7 +31,7 @@ body {
     left: 0;
     width: 83px;
     height: 83px;
-    background: url('http://1111hui.com/images/knob.png') no-repeat;
+    background: url('knob.png') no-repeat;
     z-index: 10;
     cursor: default;
     transform: rotate(164deg);
@@ -151,7 +151,7 @@ function getAngle(dom, pageX, pageY){
 
 // drag for DOM demo, without mithril.js
 var initRotate = 164;
-var dragForDom = m_drag();
+var dragForDom = mdrag();
 var downHandler = function(idx){
     return dragForDom('knob'+idx, {rotate:initRotate}, function(evt, data, dragStore){
         var angle = -getAngle(data.target, data.pageX, data.pageY);
@@ -191,7 +191,7 @@ var com = {
         var LI_WIDTH = 200
         var LI_HEIGHT = 82
         var dragClass = 'active'
-        var dragForVDom = m_drag();  // set mithril.m function as option
+        var dragForVDom = mdrag();  // set mithril.m function as option
         ctrl.redrawCount = 0
         ctrl.eventCache = {}
         ctrl.addClass = function(dom, className){
