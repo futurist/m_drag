@@ -1,4 +1,4 @@
-# m_drag
+# mdrag
 
 **no dependancy, minimum but strong drag lib for both dom and virtual dom support**
 
@@ -7,17 +7,25 @@
 - `NodeJS`:
 
 ````bash
-npm install -S m_drag
+npm install -S mdrag
 ````
 
 - `Browser`:
 
-1. download `dist/m_drag.js` file into your folder
+**unpkg**
 
-2. included `m_drag.js` in your html, **no dependancy**
+```html
+<script src="https://unpkg.com/mdrag"></script>
+```
+
+**Manually**
+
+1. download `dist/mdrag.iife.js` file into your folder
+
+2. included `mdrag.iife.js` in your html, **no dependancy**
 
 ````html
-<script type="text/javascript" src="js/m_drag.js"></script>
+<script type="text/javascript" src="js/mdrag.iife.js"></script>
 ````
 
 # Usage
@@ -30,7 +38,7 @@ var clip = document.createElement('div')
 clip.style.cssText = "position:absolute; z-index:999; border:1px dotted red"
 document.body.appendChild(clip)
 
-var clipDrag = m_drag({});	// param can be empty or some options {...}
+var clipDrag = mdrag({});	// param can be empty or some options {...}
 
 document.body.onmousedown = 
 clipDrag(
@@ -69,18 +77,18 @@ m('div.draggable',
 
 # API
 
-## m_drag([options]) => downHandler
+## mdrag([options]) => downHandler
 
 **create drag root factory, return a function that can be handler for mousedown etc.**
 
 **options** is js object, can be following key:
 
-- `revertOnFail`: boolean(default true), when move event return `false`, m_drag will stop drag then, if this option is `true`, will revert to previous data
+- `revertOnFail`: boolean(default true), when move event return `false`, mdrag will stop drag then, if this option is `true`, will revert to previous data
 - `touch`:  boolean(default auto detect), if false, will force using mouse event instead of touch event through the browser has `touchmove` event. useful in phantom etc.
 
 ## {downHandler}( name, [userdata], moveFunc, upFunc )
 
-**the handler function returned from m_drag, which can be using as handler for onmousedown/touchstart or anything you want to trigger a drag**
+**the handler function returned from mdrag, which can be using as handler for onmousedown/touchstart or anything you want to trigger a drag**
 
 - `name`:  string, save internally to back reference, this will allow you to get drag status at any time, make 2 drag interact etc.
 - `userdata`:  object, that can pass in customer key&val, can accessable using `data.user` in `moveFunc` and `upFunc` function
