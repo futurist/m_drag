@@ -1,11 +1,11 @@
 {
   "name": "mdrag",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "no dependancy, minimum but strong drag lib for both dom and virtual dom support",
   "main": "dist/mdrag.cjs.js",
   "browser": "dist/mdrag.iife.js",
   "scripts": {
-    "make": "jshint lib/*.js && gulp",
+    "build": "rollup -c",
     "test": "gulp jshint && node test/ptest-runner.js"
   },
   "author": "James Yang <jamesyang999@gmail.com>",

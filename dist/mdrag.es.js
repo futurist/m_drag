@@ -22,7 +22,7 @@ function mdrag(options) {
 			data.target = this;
 			data.ox = e.ox || e.pageX;
 			data.oy = e.oy || e.pageY;
-			if (data.user.onmousedown && data.user.onmousedown.call(this, evt, data, dragRoot) === false) { return; }
+			if (data.state.onmousedown && data.state.onmousedown.call(this, evt, data, dragRoot) === false) { return; }
 			data.type = evt.type;
 		}
 	}
@@ -71,7 +71,7 @@ function mdrag(options) {
 		delete dragRoot[name];
 		dragRoot[name] = {
 			name: name,
-			user: data || {},
+			state: data || {},
 			move: moveCB,
 			up: upCB
 		};

@@ -166,11 +166,11 @@ var downHandler = function(idx){
         knob4.target = document.querySelectorAll('.knob')[4]
         var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
         targets.forEach(function(d){
-            d.target.firstChild.style.transform = 'rotate('+ ( d.user.rotate+delta[idx] ) +'deg)'
+            d.target.firstChild.style.transform = 'rotate('+ ( d.state.rotate+delta[idx] ) +'deg)'
         })
 
     }, function(evt, data){
-        data.user.rotate+=data.dx
+        data.state.rotate+=data.dx
     });
 }
 
