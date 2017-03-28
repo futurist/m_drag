@@ -92,7 +92,8 @@ function mdrag (options) {
     }
 		context.destroy = function () {
 			if (el) { el.removeEventListener(downE, startCB, larg); }
-			dragRoot[name] = null;
+			delete dragRoot[name];
+			context.destroyed = true;
 			// console.log(name, el, dragRoot[name])
 		};
     dragRoot[name] = context;
