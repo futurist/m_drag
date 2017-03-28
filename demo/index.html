@@ -153,7 +153,7 @@ function getAngle(dom, pageX, pageY){
 var initRotate = 164;
 var dragForDom = mdrag();
 var downHandler = function(idx){
-    return dragForDom('knob'+idx, {rotate:initRotate}, function(evt, data, dragStore){
+    return dragForDom({name: 'knob'+idx, rotate:initRotate}, function(evt, data, dragStore){
         var angle = -getAngle(data.target, data.pageX, data.pageY);
         if(idx==4) return;  // knob4 is passive controlled
         var delta = [
@@ -204,9 +204,9 @@ var com = {
         }
         ctrl.downHandler = function(pos, idx){
             return dragForVDom(
-	            	'news'+pos+idx, 
 	            	{
-	            		onmousedown:function(){
+                        name: 'news'+pos+idx,
+	            		onstart:function(){
 	            			// prevent mithril redraw to allow mouse move
 	            			m.redraw.strategy('none'); 
 	            		}
@@ -217,7 +217,8 @@ var com = {
 		                var moveX = Math.round(-data.dx/LI_WIDTH)
 		                var moveY = Math.round(-data.dy/LI_HEIGHT)
 		                ctrl.addClass(data.target, dragClass)
-		                
+		                // console.log(data)
+                        
 		                // below code to keep mousemove between mithril redraw
 		                evt.key = news[pos][idx]
 		                evt.oy = data.oy+moveY*LI_HEIGHT
@@ -230,7 +231,8 @@ var com = {
 		                	// remember to delete registered dragHandler here
 		                	// since the element is not exists in dom according to news model
 		                	// Or, there may cause a MEMORY LEAK!!!!!!
-		                	delete dragStore['news'+pos+idx]
+		                	// delete dragStore['news'+pos+idx]
+                            data.destroy()
 
 		            		news[opposite].splice( Math.max(0, Math.min(idx+moveY, news[opposite].length)), 0, n.pop() )
 		                	m.redraw()
@@ -248,6 +250,7 @@ var com = {
 		            // mouse up handler
 		            function(evt, data, dragStore){
 		                ctrl.eventCache={}
+                        console.log(data.target)
 		                ctrl.removeClass(data.target, dragClass)
 		            }
             )
