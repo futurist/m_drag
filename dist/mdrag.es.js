@@ -9,6 +9,7 @@ function mdrag (options) {
     if (!(i in options)) { options[i] = defaultOptions[i]; }
   }
   if ('touch' in options) { isTouch = options.touch; }
+	var larg = 'larg' in options ? options.larg : false;
   var downE = isTouch ? 'touchstart' : 'mousedown';
   var moveE = isTouch ? 'touchmove' : 'mousemove';
   var upE = isTouch ? 'touchend' : 'mouseup';
@@ -62,8 +63,8 @@ function mdrag (options) {
       data.dx = data.dy = 0;
     }
   }
-  document.addEventListener(moveE, moveHandle);
-  document.addEventListener(upE, upHandle);
+  document.addEventListener(moveE, moveHandle, larg);
+  document.addEventListener(upE, upHandle, larg);
 
   function dragHandler (data, moveCB, endCB) {
     if (arguments.length === 0) { return dragRoot }
@@ -84,11 +85,11 @@ function mdrag (options) {
     // auto bind down event if have data.el
     var el = data.el;
     if (el) {
-      el.addEventListener(downE, startCB);
+      el.addEventListener(downE, startCB, larg);
       el.mdrag = context;
     }
 		context.destroy = function () {
-			if (el) { el.removeEventListener(downE, startCB); }
+			if (el) { el.removeEventListener(downE, startCB, larg); }
 			dragRoot[name] = null;
 			// console.log(name, el, dragRoot[name])
 		};
@@ -97,8 +98,8 @@ function mdrag (options) {
   }
   dragHandler.destroyAll = function () {
     dragRoot = {};
-    document.removeEventListener(moveE, moveHandle);
-    document.removeEventListener(upE, upHandle);
+    document.removeEventListener(moveE, moveHandle, larg);
+    document.removeEventListener(upE, upHandle, larg);
   };
   return dragHandler
 }

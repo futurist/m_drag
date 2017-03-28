@@ -152,8 +152,14 @@ function getAngle(dom, pageX, pageY){
 // drag for DOM demo, without mithril.js
 var initRotate = 164;
 var dragForDom = mdrag();
-var downHandler = function(idx){
-    return dragForDom({name: 'knob'+idx, rotate:initRotate}, function(evt, data, dragStore){
+var downHandler = function(idx, el){
+    el.style.touchAction = 'none'
+    return dragForDom({
+        name: 'knob'+idx, 
+        el:el, 
+        larg: {passive:false},
+        rotate:initRotate}, function(evt, data, dragStore){
+        evt.preventDefault()
         var angle = -getAngle(data.target, data.pageX, data.pageY);
         if(idx==4) return;  // knob4 is passive controlled
         var delta = [
@@ -175,7 +181,10 @@ var downHandler = function(idx){
 }
 
 var con = document.querySelectorAll('.knob')
-for(var i=con.length;i--;) con[i].onmousedown = downHandler(i)
+for(var i=con.length;i--;) {
+    downHandler(i, con[i])
+    // con[i].onmousedown = downHandler(i)
+} 
 
 
 // vdom part
