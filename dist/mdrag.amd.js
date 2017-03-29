@@ -91,7 +91,8 @@ function mdrag (options) {
       name: name,
       config: config,
       start: startCB,
-      root: dragRoot
+      root: dragRoot,
+      options: options
     };
 
     // auto bind down event if have data.el
@@ -120,7 +121,6 @@ function mdrag (options) {
     document.removeEventListener(moveE, moveHandle, larg);
     document.removeEventListener(endE, endHandle, larg);
   };
-  dragHandler.options = options;
   return dragHandler
 }
 
