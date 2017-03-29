@@ -82,8 +82,8 @@ function mdrag (options) {
     if (arguments.length === 0) { return dragRoot }
     config = config || {};
     config.getEvent = config.getEvent || function(evt) {
-      return /touch/.test(evt.type) 
-        ? /end/.test(evt.type) ? evt.changedTouches[0] : evt.touches[0]
+      return /touch/.test(evt.type)
+        ? evt.changedTouches && evt.changedTouches[0] || evt.touches[0]
         : evt
     };
     var name = config.name || '$' + counter++;

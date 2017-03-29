@@ -168,6 +168,7 @@ var downHandler = function(idx, el){
             console.log(force, data)
         },
         onmove: function(evt, data){
+            // console.log(evt)
             evt.preventDefault()
             var angle = -getAngle(data.target, data.pageX, data.pageY);
             if(idx==4) return;  // knob4 is passive controlled
