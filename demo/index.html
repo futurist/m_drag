@@ -22,7 +22,8 @@ body {
     height: 83px;
     position: relative;
     float: left;
-    margin: 20px
+    margin: 20px;
+    touch-action: none;
 }
 
 .knob .top {
@@ -156,14 +157,16 @@ var dragForDom = mdrag({
     // startE: 'keydown'
 });
 var downHandler = function(idx, el){
-    el.style.touchAction = 'pan-x pan-y'
+    // el.style.touchAction = 'pan-x pan-y'
     // el.tabIndex = idx
     return dragForDom({
         name: 'knob'+idx, 
-        el:el, 
-        touchAction: 'pan-x',
+        el:el,
         larg: {capture: true},
         rotate:initRotate,
+        ondestroy: function(force, data) {
+            console.log(force, data)
+        },
         onmove: function(evt, data){
             evt.preventDefault()
             var angle = -getAngle(data.target, data.pageX, data.pageY);
