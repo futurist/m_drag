@@ -153,11 +153,12 @@ function getAngle(dom, pageX, pageY){
 var initRotate = 164;
 var dragForDom = mdrag();
 var downHandler = function(idx, el){
-    el.style.touchAction = 'none'
+    el.style.touchAction = 'pan-x pan-y'
     return dragForDom({
         name: 'knob'+idx, 
         el:el, 
-        larg: {passive:false},
+        touchAction: 'pan-x',
+        larg: {capture: true},
         rotate:initRotate}, function(evt, data, dragStore){
         evt.preventDefault()
         var angle = -getAngle(data.target, data.pageX, data.pageY);
@@ -172,11 +173,11 @@ var downHandler = function(idx, el){
         knob4.target = document.querySelectorAll('.knob')[4]
         var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
         targets.forEach(function(d){
-            d.target.firstChild.style.transform = 'rotate('+ ( d.state.rotate+delta[idx] ) +'deg)'
+            d.target.firstChild.style.transform = 'rotate('+ ( d.config.rotate+delta[idx] ) +'deg)'
         })
 
     }, function(evt, data){
-        data.state.rotate+=data.dx
+        data.config.rotate+=data.dx
     });
 }
 

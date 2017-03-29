@@ -27,7 +27,7 @@ function mdrag (options) {
       data.target = this;
       data.ox = e.ox || e.pageX;
       data.oy = e.oy || e.pageY;
-      if (data.state.onstart && data.state.onstart.call(this, evt, data, dragRoot) === false) { return }
+      if (data.config.onstart && data.config.onstart.call(this, evt, data, dragRoot) === false) { return }
       data.type = evt.type;
     }
   }
@@ -79,7 +79,7 @@ function mdrag (options) {
     var startCB = getDownFunc(name);
     var context = {
       name: name,
-      state: data || {},
+      config: data || {},
       start: startCB,
       move: moveCB,
       end: endCB
@@ -87,12 +87,19 @@ function mdrag (options) {
 
     // auto bind down event if have data.el
     var el = data.el;
+		var prevTouchAction;
     if (el) {
+			var elStyle = el.style;
+			prevTouchAction = elStyle.touchAction;
+			elStyle.touchAction = data.touchAction || 'none';
       el.addEventListener(downE, startCB, larg);
       el.mdrag = context;
     }
 		context.destroy = function () {
-			if (el) { el.removeEventListener(downE, startCB, larg); }
+			if (el) {
+				elStyle.touchAction = prevTouchAction;
+				el.removeEventListener(downE, startCB, larg);
+			}
 			delete dragRoot[name];
 			context.destroyed = true;
 			// console.log(name, el, dragRoot[name])
