@@ -2,6 +2,7 @@
 
 var defaultOptions = {
   revertOnFail: true,
+  larg: false,
   touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch)
 };
 
@@ -110,10 +111,13 @@ function mdrag (options) {
     return startCB
   }
   dragHandler.destroyAll = function () {
-    dragRoot = {};
+    for (var name in dragRoot) {
+      dragRoot[name].destroy();
+    }
     document.removeEventListener(moveE, moveHandle, larg);
     document.removeEventListener(upE, upHandle, larg);
   };
+  dragHandler.options = options;
   return dragHandler
 }
 
