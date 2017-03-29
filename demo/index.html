@@ -153,11 +153,11 @@ function getAngle(dom, pageX, pageY){
 var initRotate = 164;
 var dragForDom = mdrag({
     // touch: true,
-    startE: 'keydown'
+    // startE: 'keydown'
 });
 var downHandler = function(idx, el){
     el.style.touchAction = 'pan-x pan-y'
-    el.tabIndex = idx
+    // el.tabIndex = idx
     return dragForDom({
         name: 'knob'+idx, 
         el:el, 

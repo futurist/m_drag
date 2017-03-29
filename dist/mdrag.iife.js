@@ -23,9 +23,9 @@ function mdrag (options) {
 
   function getDownFunc (name) {
     return function downHandle (evt) {
-      var e = /touch/.test(evt.type) ? evt.touches[0] : evt;
       var data = dragRoot[name];
       if (!data) { return }
+      var e = data.e = data.config.getEvent(evt);
       data.target = this;
       data.ox = e.ox || e.pageX;
       data.oy = e.oy || e.pageY;
@@ -38,19 +38,20 @@ function mdrag (options) {
   }
 
   function moveHandle (evt) {
-    var e = /touch/.test(evt.type) ? evt.touches[0] : evt;
-    var isDown = false;
+    var hasStarted = false;
     for (var name in dragRoot) {
       var data = dragRoot[name];
       if (!data.type) { continue }
-      isDown = true;
+      hasStarted = true;
+      var config = data.config;
+      var e = data.e = config.getEvent(evt);
       var stack = [data.pageX, data.pageY, data.dx, data.dy];
       data.pageX = e.pageX;
       data.pageY = e.pageY;
       data.dx = data.ox - e.pageX;
       data.dy = data.oy - e.pageY;
-      var move = data.config.onmove;
-      if (move && move(evt, data, dragRoot) === false) {
+      var onmove = config.onmove;
+      if (onmove && onmove(evt, data, dragRoot) === false) {
         if (options.revertOnFail) {
           data.dy = stack.pop();
           data.dx = stack.pop();
@@ -60,15 +61,16 @@ function mdrag (options) {
         return endHandle(evt)
       }
     }
-    if (isDown) { evt.preventDefault(); }
+    if (hasStarted) { evt.preventDefault(); }
   }
 
   function endHandle (evt) {
     for (var name in dragRoot) {
       var data = dragRoot[name];
       if (!data.type) { continue }
-      var end = data.config.onend;
-      end && end(evt, data, dragRoot);
+      data.e = data.config.getEvent(evt);
+      var onend = data.config.onend;
+      onend && onend(evt, data, dragRoot);
       data.type = null;
       data.dx = data.dy = 0;
     }
@@ -79,6 +81,9 @@ function mdrag (options) {
   function dragHandler (config) {
     if (arguments.length === 0) { return dragRoot }
     config = config || {};
+    config.getEvent = config.getEvent || function(evt) {
+      return /touch/.test(evt.type) ? evt.touches[0] : evt
+    };
     var name = config.name || '$' + counter++;
     if (dragRoot[name]) {
       dragRoot[name].destroy();
