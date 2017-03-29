@@ -3,7 +3,7 @@ var mdrag = (function () {
 
 var defaultOptions = {
   revertOnFail: true,
-	touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch)
+  touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch)
 };
 
 function mdrag (options) {
@@ -13,7 +13,7 @@ function mdrag (options) {
   }
   var isTouch = options.touch;
   var larg = options.larg;
-	// var larg = 'larg' in options ? options.larg : false
+  // var larg = 'larg' in options ? options.larg : false
   var downE = isTouch ? 'touchstart' : 'mousedown';
   var moveE = isTouch ? 'touchmove' : 'mousemove';
   var upE = isTouch ? 'touchend' : 'mouseup';
@@ -28,7 +28,10 @@ function mdrag (options) {
       data.target = this;
       data.ox = e.ox || e.pageX;
       data.oy = e.oy || e.pageY;
-      if (data.config.onstart && data.config.onstart.call(this, evt, data, dragRoot) === false) { return }
+      var onstart = data.config.onstart;
+      if (onstart && onstart.call(
+          this, evt, data, dragRoot
+        ) === false) { return }
       data.type = evt.type;
     }
   }
@@ -72,7 +75,7 @@ function mdrag (options) {
 
   function dragHandler (config, moveCB, endCB) {
     if (arguments.length === 0) { return dragRoot }
-		if (typeof config == 'function') { endCB = moveCB, moveCB = config, config = {}; }
+    if (typeof config == 'function') { endCB = moveCB, moveCB = config, config = {}; }
     var name = config.name || '$' + counter++;
     if (dragRoot[name]) {
       dragRoot[name].destroy();
@@ -88,22 +91,22 @@ function mdrag (options) {
 
     // auto bind down event if have data.el
     var el = config.el;
-		var prevTouchAction;
+    var prevTouchAction;
     if (el) {
-			prevTouchAction = el.style.touchAction;
-			if(isTouch) { el.style.touchAction = config.touchAction || 'none'; }
+      prevTouchAction = el.style.touchAction;
+      if (isTouch) { el.style.touchAction = config.touchAction || 'none'; }
       el.addEventListener(downE, startCB, larg);
       el.mdrag = context;
     }
-		context.destroy = function () {
-			if (el) {
-				if(isTouch) { el.style.touchAction = prevTouchAction; }
-				el.removeEventListener(downE, startCB, larg);
-			}
-			delete dragRoot[name];
-			context.destroyed = true;
-			// console.log(name, el, dragRoot[name])
-		};
+    context.destroy = function () {
+      if (el) {
+        if (isTouch) { el.style.touchAction = prevTouchAction; }
+        el.removeEventListener(downE, startCB, larg);
+      }
+      delete dragRoot[name];
+      context.destroyed = true;
+    // console.log(name, el, dragRoot[name])
+    };
     dragRoot[name] = context;
     return startCB
   }
