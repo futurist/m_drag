@@ -151,7 +151,9 @@ function getAngle(dom, pageX, pageY){
 
 // drag for DOM demo, without mithril.js
 var initRotate = 164;
-var dragForDom = mdrag();
+var dragForDom = mdrag({
+    touch: true
+});
 var downHandler = function(idx, el){
     el.style.touchAction = 'pan-x pan-y'
     return dragForDom({
@@ -175,8 +177,10 @@ var downHandler = function(idx, el){
         targets.forEach(function(d){
             d.target.firstChild.style.transform = 'rotate('+ ( d.config.rotate+delta[idx] ) +'deg)'
         })
+        // console.log(data)
 
     }, function(evt, data){
+        console.log(data)
         data.config.rotate+=data.dx
     });
 }
