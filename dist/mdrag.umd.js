@@ -1,5 +1,8 @@
-var mdrag = (function () {
-'use strict';
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.mdrag = factory());
+}(this, (function () { 'use strict';
 
 var defaultOptions = {
   revertOnFail: true,
@@ -127,4 +130,4 @@ function mdrag (options) {
 
 return mdrag;
 
-}());
+})));

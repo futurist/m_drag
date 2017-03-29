@@ -164,7 +164,7 @@ var downHandler = function(idx, el){
         touchAction: 'pan-x',
         larg: {capture: true},
         rotate:initRotate,
-        onmove: function(evt, data, dragStore){
+        onmove: function(evt, data){
             evt.preventDefault()
             var angle = -getAngle(data.target, data.pageX, data.pageY);
             if(idx==4) return;  // knob4 is passive controlled
@@ -174,7 +174,7 @@ var downHandler = function(idx, el){
                 angle,angle,    //for knob2-5
                 angle,angle,
             ]
-            var knob4 = dragStore['knob4']
+            var knob4 = data.root['knob4']
             knob4.target = document.querySelectorAll('.knob')[4]
             var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
             targets.forEach(function(d){
@@ -229,7 +229,7 @@ var com = {
                         m.redraw.strategy('none'); 
                     },
 	            	// mouse move handler
-	            	onmove: function(evt, data, dragStore){
+	            	onmove: function(evt, data){
 
 		                var moveX = Math.round(-data.dx/LI_WIDTH)
 		                var moveY = Math.round(-data.dy/LI_HEIGHT)
@@ -264,7 +264,7 @@ var com = {
 		            },
 
 		            // mouse up handler
-		            onend: function(evt, data, dragStore){
+		            onend: function(evt, data){
 		                ctrl.eventCache={}
                         console.log(data.target)
 		                ctrl.removeClass(data.target, dragClass)

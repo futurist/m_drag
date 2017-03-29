@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "no dependancy, minimum but strong drag lib for both dom and virtual dom support",
   "main": "dist/mdrag.cjs.js",
-  "browser": "dist/mdrag.iife.js",
+  "browser": "dist/mdrag.umd.js",
   "scripts": {
     "build": "rollup -c",
     "test": "gulp jshint && node test/ptest-runner.js"
