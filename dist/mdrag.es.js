@@ -46,7 +46,8 @@ function mdrag (options) {
       data.pageY = e.pageY;
       data.dx = data.ox - e.pageX;
       data.dy = data.oy - e.pageY;
-      if (data.move && data.move(evt, data, dragRoot) === false) {
+      var move = data.config.onmove;
+      if (move && move(evt, data, dragRoot) === false) {
         if (options.revertOnFail) {
           data.dy = stack.pop();
           data.dx = stack.pop();
@@ -63,7 +64,8 @@ function mdrag (options) {
     for (var name in dragRoot) {
       var data = dragRoot[name];
       if (!data.type) { continue }
-      data.end && data.end(evt, data, dragRoot);
+      var end = data.config.onend;
+      end && end(evt, data, dragRoot);
       data.type = null;
       data.dx = data.dy = 0;
     }
@@ -71,9 +73,9 @@ function mdrag (options) {
   document.addEventListener(moveE, moveHandle, larg);
   document.addEventListener(upE, upHandle, larg);
 
-  function dragHandler (config, moveCB, endCB) {
+  function dragHandler (config) {
     if (arguments.length === 0) { return dragRoot }
-    if (typeof config == 'function') { endCB = moveCB, moveCB = config, config = {}; }
+    config = config || {};
     var name = config.name || '$' + counter++;
     if (dragRoot[name]) {
       dragRoot[name].destroy();
@@ -81,10 +83,8 @@ function mdrag (options) {
     var startCB = getDownFunc(name);
     var context = {
       name: name,
-      config: config || {},
-      start: startCB,
-      move: moveCB,
-      end: endCB
+      config: config,
+      start: startCB
     };
 
     // auto bind down event if have data.el
@@ -105,7 +105,7 @@ function mdrag (options) {
       context.destroyed = true;
     // console.log(name, el, dragRoot[name])
     };
-    dragRoot[name] = context;
+    startCB.mdrag = dragRoot[name] = context;
     return startCB
   }
   dragHandler.destroyAll = function () {

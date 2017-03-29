@@ -161,28 +161,30 @@ var downHandler = function(idx, el){
         el:el, 
         touchAction: 'pan-x',
         larg: {capture: true},
-        rotate:initRotate}, function(evt, data, dragStore){
-        evt.preventDefault()
-        var angle = -getAngle(data.target, data.pageX, data.pageY);
-        if(idx==4) return;  // knob4 is passive controlled
-        var delta = [
-            data.dx,    //for knob0
-            data.dy,    //for knob1
-            angle,angle,    //for knob2-5
-            angle,angle,
-        ]
-        var knob4 = dragStore['knob4']
-        knob4.target = document.querySelectorAll('.knob')[4]
-        var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
-        targets.forEach(function(d){
-            d.target.firstChild.style.transform = 'rotate('+ ( d.config.rotate+delta[idx] ) +'deg)'
-        })
-        // console.log(data)
+        rotate:initRotate,
+        onmove: function(evt, data, dragStore){
+            evt.preventDefault()
+            var angle = -getAngle(data.target, data.pageX, data.pageY);
+            if(idx==4) return;  // knob4 is passive controlled
+            var delta = [
+                data.dx,    //for knob0
+                data.dy,    //for knob1
+                angle,angle,    //for knob2-5
+                angle,angle,
+            ]
+            var knob4 = dragStore['knob4']
+            knob4.target = document.querySelectorAll('.knob')[4]
+            var targets = [3,5].indexOf(idx)>-1 ? [knob4, data] : [data]
+            targets.forEach(function(d){
+                d.target.firstChild.style.transform = 'rotate('+ ( d.config.rotate+delta[idx] ) +'deg)'
+            })
+            // console.log(data)
 
-    }, function(evt, data){
-        console.log(data)
-        data.config.rotate+=data.dx
-    });
+        },
+        onend: function(evt, data){
+            console.log(data)
+            data.config.rotate+=data.dx
+    }})
 }
 
 var con = document.querySelectorAll('.knob')
@@ -218,15 +220,14 @@ var com = {
         }
         ctrl.downHandler = function(pos, idx){
             return dragForVDom(
-	            	{
-                        name: 'news'+pos+idx,
-	            		onstart:function(){
-	            			// prevent mithril redraw to allow mouse move
-	            			m.redraw.strategy('none'); 
-	            		}
-	            	}, 
+                {
+                    name: 'news'+pos+idx,
+                    onstart:function(){
+                        // prevent mithril redraw to allow mouse move
+                        m.redraw.strategy('none'); 
+                    },
 	            	// mouse move handler
-	            	function(evt, data, dragStore){
+	            	onmove: function(evt, data, dragStore){
 
 		                var moveX = Math.round(-data.dx/LI_WIDTH)
 		                var moveY = Math.round(-data.dy/LI_HEIGHT)
@@ -258,15 +259,15 @@ var com = {
 		                    news[pos][idx] = t
 		                    m.redraw()
 		                }
-
 		            },
 
 		            // mouse up handler
-		            function(evt, data, dragStore){
+		            onend: function(evt, data, dragStore){
 		                ctrl.eventCache={}
                         console.log(data.target)
 		                ctrl.removeClass(data.target, dragClass)
 		            }
+                }
             )
         }
     },
