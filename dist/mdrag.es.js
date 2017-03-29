@@ -12,9 +12,9 @@ function mdrag (options) {
   var isTouch = options.touch;
   var larg = options.larg;
   // var larg = 'larg' in options ? options.larg : false
-  var downE = isTouch ? 'touchstart' : 'mousedown';
-  var moveE = isTouch ? 'touchmove' : 'mousemove';
-  var upE = isTouch ? 'touchend' : 'mouseup';
+  var startE = options.startE || (isTouch ? 'touchstart' : 'mousedown');
+  var moveE = options.moveE || (isTouch ? 'touchmove' : 'mousemove');
+  var endE = options.endE || (isTouch ? 'touchend' : 'mouseup');
   var dragRoot = {};
   var counter = 0;
 
@@ -54,13 +54,13 @@ function mdrag (options) {
           data.pageY = stack.pop();
           data.pageX = stack.pop();
         }
-        return upHandle(evt)
+        return endHandle(evt)
       }
     }
     if (isDown) { evt.preventDefault(); }
   }
 
-  function upHandle (evt) {
+  function endHandle (evt) {
     for (var name in dragRoot) {
       var data = dragRoot[name];
       if (!data.type) { continue }
@@ -71,7 +71,7 @@ function mdrag (options) {
     }
   }
   document.addEventListener(moveE, moveHandle, larg);
-  document.addEventListener(upE, upHandle, larg);
+  document.addEventListener(endE, endHandle, larg);
 
   function dragHandler (config) {
     if (arguments.length === 0) { return dragRoot }
@@ -93,13 +93,13 @@ function mdrag (options) {
     if (el) {
       prevTouchAction = el.style.touchAction;
       if (isTouch) { el.style.touchAction = config.touchAction || 'none'; }
-      el.addEventListener(downE, startCB, larg);
+      el.addEventListener(startE, startCB, larg);
       el.mdrag = context;
     }
     context.destroy = function () {
       if (el) {
         if (isTouch) { el.style.touchAction = prevTouchAction; }
-        el.removeEventListener(downE, startCB, larg);
+        el.removeEventListener(startE, startCB, larg);
       }
       delete dragRoot[name];
       context.destroyed = true;
@@ -113,7 +113,7 @@ function mdrag (options) {
       dragRoot[name].destroy();
     }
     document.removeEventListener(moveE, moveHandle, larg);
-    document.removeEventListener(upE, upHandle, larg);
+    document.removeEventListener(endE, endHandle, larg);
   };
   dragHandler.options = options;
   return dragHandler
