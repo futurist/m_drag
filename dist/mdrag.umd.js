@@ -10,6 +10,10 @@ var defaultOptions = {
   touch: ('ontouchstart' in window) || ('DocumentTouch' in window && document instanceof DocumentTouch)
 };
 
+function splitEvents(str){
+  return str.split(/\s*,\s*/g)
+}
+
 function mdrag (options) {
   options = options || {};
   for (var i in defaultOptions) {
@@ -18,9 +22,11 @@ function mdrag (options) {
   var isTouch = options.touch;
   var larg = options.larg;
   // var larg = 'larg' in options ? options.larg : false
-  var startE = options.startE || (isTouch ? 'touchstart' : 'mousedown');
-  var moveE = options.moveE || (isTouch ? 'touchmove' : 'mousemove');
-  var endE = options.endE || (isTouch ? 'touchend' : 'mouseup');
+  var startE = options.startE || splitEvents(isTouch ? 'touchstart' : 'mousedown');
+  var moveE = options.moveE || splitEvents(isTouch ? 'touchmove' : 'mousemove');
+  var endE = options.endE || splitEvents(isTouch
+    ? 'touchend,touchcancel'
+    : 'mouseup,mouseleave');
   var dragRoot = {};
   var counter = 0;
 
@@ -75,8 +81,12 @@ function mdrag (options) {
       data.dx = data.dy = 0;
     }
   }
-  document.addEventListener(moveE, moveHandle, larg);
-  document.addEventListener(endE, endHandle, larg);
+  moveE.forEach(function(e) {
+    document.addEventListener(e, moveHandle, larg);
+  });
+  endE.forEach(function(e) {
+    document.addEventListener(e, endHandle, larg);
+  });
 
   function dragHandler (config) {
     if (arguments.length === 0) { return dragRoot }
@@ -102,14 +112,18 @@ function mdrag (options) {
     // auto bind down event if have data.el
     var el = config.el;
     if (el) {
-      el.addEventListener(startE, startCB, larg);
+      startE.forEach(function(e){
+        el.addEventListener(e, startCB, larg);
+      });
       el.mdrag = context;
     }
     context.destroy = function (force) {
       var ondestroy = config.ondestroy;
       if(!force && ondestroy && ondestroy(force, context)===false) { return }
       if (el) {
-        el.removeEventListener(startE, startCB, larg);
+        startE.forEach(function(e){
+          el.removeEventListener(e, startCB, larg);
+        });
       }
       delete dragRoot[name];
       context.destroyed = true;
@@ -122,8 +136,12 @@ function mdrag (options) {
     for (var name in dragRoot) {
       dragRoot[name].destroy(true);
     }
-    document.removeEventListener(moveE, moveHandle, larg);
-    document.removeEventListener(endE, endHandle, larg);
+    moveE.forEach(function(e) {
+      document.removeEventListener(e, moveHandle, larg);
+    });
+    endE.forEach(function(e) {
+      document.removeEventListener(e, endHandle, larg);
+    });
   };
   return dragHandler
 }
